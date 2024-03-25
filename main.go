@@ -49,8 +49,8 @@ func main() {
 		// 通过C2CItemsId下架商品
 		err = bilibili.DropItem(item.C2CItemsId)
 		if err != nil {
-			fmt.Println("发生致命错误！" + err.Error())
-			return
+			fmt.Println("下架商品发生致命错误！跳过。[" + err.Error() + "]")
+			continue
 		}
 		fmt.Println("成功！")
 
@@ -63,36 +63,36 @@ func main() {
 		}
 
 		// 延迟1秒
-		time.Sleep(time.Second)
+		//time.Sleep(time.Second)
 
 		// call 市集 check接口，将收集的BlindBoxId一起传过去，来获取后续操作的token
 		fmt.Print(fmt.Sprintf("对捡起的%d物件进行准备...", len(itemsList)))
 		err, token, showTime := bilibili.CheckItems(itemsList)
 		if err != nil {
-			fmt.Println("发生致命错误！" + err.Error())
-			return
+			fmt.Println("发生致命错误！跳过。[" + err.Error() + "]")
+			continue
 		}
 		fmt.Println("成功！")
 		fmt.Print(fmt.Sprintf("<%s> ，售价：%s ，剩余时间：%s", item.C2CItemsName, item.ShowPrice, showTime))
 
 		// 延迟1秒
-		time.Sleep(time.Second)
+		//time.Sleep(time.Second)
 
 		// call publish接口，先将isConfirm设置为false请求一次（其实应该可以跳过这步，目前是为了被检测作为保险）
 		err, _, discount := bilibili.PublishItem(item.ShowPrice, token, false)
 		if err != nil {
-			fmt.Println("...发生致命错误！" + err.Error())
-			return
+			fmt.Println("...发生致命错误！跳过。[" + err.Error() + "]")
+			continue
 		}
 		fmt.Println(fmt.Sprintf("，商品折扣：%s", discount))
-		time.Sleep(time.Second)
+		//time.Sleep(time.Second)
 		fmt.Print(fmt.Sprintf("开始执行上架商品 <%s> ...", item.C2CItemsName))
 
 		// 第二次call publish接口将isConfirm设置为true正式上架
 		err, isPublish, _ := bilibili.PublishItem(item.ShowPrice, token, true)
 		if err != nil {
-			fmt.Println("发生致命错误！" + err.Error())
-			return
+			fmt.Println("发生致命错误！跳过。[" + err.Error() + "]")
+			continue
 		}
 		if isPublish {
 			fmt.Println("成功！")
@@ -101,6 +101,6 @@ func main() {
 		}
 
 		// 一件商品上下架完成后延迟1秒，循环下一件
-		time.Sleep(time.Second)
+		//time.Sleep(time.Second)
 	}
 }
